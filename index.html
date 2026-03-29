@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WHISPERS</title>
+<style>
+    body {
+        background: black;
+        color: red;
+        font-family: "Courier New", monospace;
+        text-align: center;
+        padding: 20px;
+    }
+
+    #game {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    button {
+        background: darkred;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+    }
+
+    input {
+        padding: 10px;
+        margin: 10px;
+        width: 80%;
+    }
+
+    #jumpscare {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('https://i.imgur.com/8Q2QF6F.jpg') center/cover;
+        display: none;
+        z-index: 999;
+    }
+
+    #flash {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: none;
+        z-index: 998;
+    }
+</style>
+</head>
+<body>
+
+<div id="game">
+    <h1>WHISPERS</h1>
+    <p id="text">Click start... if you dare.</p>
+
+    <button onclick="startGame()">Start</button>
+
+    <div id="inputArea" style="display:none;">
+        <input type="text" id="answer" placeholder="Your answer...">
+        <button onclick="submitAnswer()">Submit</button>
+    </div>
+
+    <p id="sanity">Sanity: 3</p>
+</div>
+
+<div id="jumpscare"></div>
+<div id="flash"></div>
+
+<audio id="scareSound" src="https://www.myinstants.com/media/sounds/movie_1.mp3"></audio>
+<audio id="bgSound" src="https://www.myinstants.com/media/sounds/creepy-ambience.mp3" loop></audio>
+
+<script>
+let stage = 0;
+let sanity = 3;
+
+const text = document.getElementById("text");
+const inputArea = document.getElementById("inputArea");
+const sanityText = document.getElementById("sanity");
+
+const answers = [
+    "security guard",
+    "abandoned hospital",
+    "experiment gone wrong"
+];
+
+function startGame() {
+    document.querySelector("button").style.display = "none";
+    inputArea.style.display = "block";
+    document.getElementById("bgSound").play();
+
+    nextStage();
+}
+
+function nextStage() {
+    if(stage === 0){
+        text.innerHTML = "I worked at night...<br>I heard it first...";
+    }
+    else if(stage === 1){
+        text.innerHTML = "Long empty hallways...<br>Something is locked inside...";
+    }
+    else if(stage === 2){
+        text.innerHTML = "It wasn’t supposed to happen...<br>Something went wrong...";
+    }
+    else {
+        winGame();
+    }
+}
+
+function submitAnswer() {
+    const userAnswer = document.getElementById("answer").value.toLowerCase();
+
+    if(userAnswer.includes(answers[stage])){
+        stage++;
+        document.getElementById("answer").value = "";
+        nextStage();
+    } else {
+        loseSanity();
+    }
+}
+
+function loseSanity(){
+    sanity--;
+    sanityText.innerHTML = "Sanity: " + sanity;
+
+    triggerJumpscare();
+
+    if(sanity <= 0){
+        gameOver();
+    }
+}
+
+function triggerJumpscare(){
+    const flash = document.getElementById("flash");
+    const scare = document.getElementById("jumpscare");
+    const sound = document.getElementById("scareSound");
+
+    flash.style.display = "block";
+    setTimeout(() => flash.style.display = "none", 100);
+
+    scare.style.display = "block";
+    sound.play();
+
+    setTimeout(() => scare.style.display = "none", 700);
+}
+
+function gameOver(){
+    text.innerHTML = "YOU WERE TAKEN...";
+    inputArea.style.display = "none";
+}
+
+function winGame(){
+    text.innerHTML = "You remembered... but it’s too late.";
+    inputArea.style.display = "none";
+}
+</script>
+
+</body>
+</html>
